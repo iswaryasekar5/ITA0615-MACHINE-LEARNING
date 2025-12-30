@@ -1,0 +1,97 @@
+# ============================================
+# Breast Cancer Classification using Naive Bayes
+# ============================================
+
+# Step 1: Import required libraries
+import pandas as pd
+import numpy as np
+
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import confusion_matrix, accuracy_score, classification_report
+
+
+# Step 2: Load the Breast Cancer Dataset
+data = load_breast_cancer()
+
+# Convert dataset to DataFrame
+df = pd.DataFrame(data.data, columns=data.feature_names)
+df['target'] = data.target
+
+
+# ------------------------------------------------
+# a) Print the first five rows of the dataset
+# ------------------------------------------------
+print("\n----- First Five Rows of Dataset -----")
+print(df.head())
+
+
+# ------------------------------------------------
+# b) Basic statistical computations
+# ------------------------------------------------
+print("\n----- Statistical Summary of Dataset -----")
+print(df.describe())
+
+
+# ------------------------------------------------
+# c) Columns and their data types
+# ------------------------------------------------
+print("\n----- Columns and Data Types -----")
+print(df.dtypes)
+
+
+# ------------------------------------------------
+# d) Detect null values and replace with mode
+# ------------------------------------------------
+print("\n----- Null Values Before Handling -----")
+print(df.isnull().sum())
+
+# Replace null values with mode (if any)
+for column in df.columns:
+    if df[column].isnull().sum() > 0:
+        df[column].fillna(df[column].mode()[0], inplace=True)
+
+print("\n----- Null Values After Handling -----")
+print(df.isnull().sum())
+
+
+# ------------------------------------------------
+# e) Split data into training and testing sets
+# ------------------------------------------------
+X = df.drop('target', axis=1)
+y = df['target']
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+print("\nTraining Data Shape:", X_train.shape)
+print("Testing Data Shape:", X_test.shape)
+
+
+# ------------------------------------------------
+# f) Train Naive Bayes model and evaluate
+# ------------------------------------------------
+# Create Naive Bayes classifier
+nb = GaussianNB()
+
+# Train model
+nb.fit(X_train, y_train)
+
+# Predict test data
+y_pred = nb.predict(X_test)
+
+
+# Confusion Matrix
+cm = confusion_matrix(y_test, y_pred)
+print("\n----- Confusion Matrix -----")
+print(cm)
+
+# Accuracy Score
+accuracy = accuracy_score(y_test, y_pred)
+print("\nAccuracy:", accuracy)
+
+# Classification Report
+print("\n----- Classification Report -----")
+print(classification_report(y_test, y_pred))
